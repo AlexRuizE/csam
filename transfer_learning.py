@@ -12,20 +12,25 @@ import os
 import copy
 
 
-#
-posible_models = ['resnet', 'alexnet', 'vgg', 'squeezenet', 'densenet', 'inception']
-model_name = posible_models[3]
+# Data
+data_dir = '~/Downloads/'
+cifar = torchvision.datasets.cifar.CIFAR100(
+    root=data_dir,
+    train=True,
+    transform=None,
+    target_transform=None,
+    download=True)
 
 
-data_dir = '/home/monorhesus/Data/hymenoptera_data'
 
+# Load model
+
+
+
+# Training params
 num_classes = 2
-
 batch_size = 8
-
 num_epochs = 15
-
-# Flag for feature extracting. When False, we finetune the whole model,True we only update the reshaped layer params
 feature_extract = True
 
 
