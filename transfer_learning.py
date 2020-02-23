@@ -1,5 +1,3 @@
-# https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
