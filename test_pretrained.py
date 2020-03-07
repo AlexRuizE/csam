@@ -1,28 +1,27 @@
 # Modified from https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
 
+from src.func import *
 import os
 import torch
 # import torch.nn as nn
 # import torch.optim as optim
 # import numpy as np
 # import torchvision
-from torchvision import datasets, models, transforms
+from torchvision import transforms
 from PIL import Image
 import matplotlib.pyplot as plt
 # import time
 # import copy
 
 
-from src.func import *
 
+# Vars
+model_name = 'alexnet'
 
+# Model input size
+input_size = initialize_model(model_name, init_model=False)
 
-# Data
-data_dir = '/home/monorhesus/Data/flickr30k_images/'
-images = [i for i in os.listdir(data_dir) if '.jpg' in i]
-
-input_size = 224    # Model specific
-
+# Data transforms
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomResizedCrop(input_size),
@@ -37,6 +36,11 @@ data_transforms = {
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
 }
+
+
+data_dir = '/home/monorhesus/Data/oidv6/'
+images = (i for i in os.listdir(f'{data_dir}/train/') if '.jpg' in i)
+
 
 
 """load image, returns cuda tensor"""
