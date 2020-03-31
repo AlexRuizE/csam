@@ -4,6 +4,19 @@ from torchvision.utils import make_grid
 import matplotlib.pyplot as plt
 
 
+def get_k_img(k, img_dataset):
+    """Get k images from a <dataset>"""
+    l = len(img_dataset.imgs)
+    indices = torch._np.random.choice(l,
+                                      size=k,
+                                      replace=False)
+    img_list = [img_dataset.__getitem__(i)[0] for i in indices]
+    img_tensors = torch.stack(img_list)
+    return img_tensors
+
+
+
+
 # Paths
 in_dir = '/home/monorhesus/Data/oidv6/' # Path to Open Image Dataset root. Use toolkit.
 out_dir = '/home/monorhesus/Pictures'
@@ -37,4 +50,3 @@ for p in paddings:
         plt.axis('off')
         plt.savefig(f'{out_dir}/tiles_{p}pad_{v}bg.png', bbox_inches='tight', pad_inches=0)
         plt.close()
-
