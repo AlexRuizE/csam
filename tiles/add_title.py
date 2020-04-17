@@ -7,6 +7,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 @click.command()
 @click.argument('source_image')
+def main(source_image:str):
+    add_title(source_image).show()
+
 def add_title(source_image: str):
     """Adds a title to an image
 
@@ -14,7 +17,7 @@ def add_title(source_image: str):
         source_image (str): Path to source image
 
     Returns:
-        None: Does not return a value
+        PIL.Image: Image extended to include a title
     """
     orig_img = Image.open(source_image)
     orig_width, orig_height = orig_img.size
@@ -25,7 +28,7 @@ def add_title(source_image: str):
     image = Image.new("RGBA", (orig_width, orig_height + title_height))
     image.paste(title, (0, 0))
     image.paste(orig_img, (0, title_height))
-    image.show()
+    return image
 
 def draw_text(text: str, image_size: Tuple[int, int]):
     """Draws a text image
@@ -57,4 +60,4 @@ def pixels_to_points(pixels):
     return pixels * 72/96
 
 if __name__ == '__main__':
-    add_title()
+    main()
