@@ -7,14 +7,16 @@ from PIL import Image, ImageDraw, ImageFont
 
 @click.command()
 @click.argument('source_image')
-def main(source_image:str):
-    add_title(source_image).show()
+@click.argument('title')
+def main(source_image:str, title: str):
+    add_title(source_image, title).show()
 
-def add_title(source_image: str):
+def add_title(source_image: str, title:str):
     """Adds a title to an image
 
     Args:
         source_image (str): Path to source image
+        title (str): Title to add to image
 
     Returns:
         PIL.Image: Image extended to include a title
@@ -22,7 +24,7 @@ def add_title(source_image: str):
     orig_img = Image.open(source_image)
     orig_width, orig_height = orig_img.size
 
-    title = draw_text("text", (orig_width, floor(orig_height*0.1)))
+    title = draw_text(title, (orig_width, floor(orig_height*0.1)))
     _, title_height = title.size
 
     image = Image.new("RGBA", (orig_width, orig_height + title_height))
