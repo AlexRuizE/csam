@@ -8,16 +8,18 @@ from PIL import Image, ImageDraw, ImageFont
 @click.command()
 @click.argument("source_image")
 @click.argument("title")
-def main(source_image: str, title: str):
-    add_title(source_image, title).show()
+@click.option("--background_color", default="black", help="Background color of title.")
+def main(source_image: str, title: str, background_color: str):
+    add_title(source_image, title, background_color).show()
 
 
-def add_title(source_image: str, title: str):
+def add_title(source_image: str, title: str, background_color: str = "black"):
     """Adds a title to an image
 
     Args:
         source_image (str): Path to source image
         title (str): Title to add to image
+        background_color (str): Background color for title
 
     Returns:
         PIL.Image: Image extended to include a title
@@ -25,7 +27,7 @@ def add_title(source_image: str, title: str):
     orig_img = Image.open(source_image)
     orig_width, orig_height = orig_img.size
 
-    title = draw_text(title, (orig_width, floor(orig_height * 0.1)))
+    title = draw_text(title, (orig_width, floor(orig_height * 0.1)), background_color)
     _, title_height = title.size
 
     image = Image.new("RGBA", (orig_width, orig_height + title_height))
@@ -34,17 +36,18 @@ def add_title(source_image: str, title: str):
     return image
 
 
-def draw_text(text: str, image_size: Tuple[int, int]):
+def draw_text(text: str, image_size: Tuple[int, int], background_color: str = "black"):
     """Draws a text image
 
     Args:
         text (str): Text to draw
         image_size (Tuple[int, int]): Width, height of image to draw text on
+        background_color (str): Background color for text
 
     Returns:
         PIL.Image: An image of text
     """
-    image = Image.new("RGBA", image_size, color="blue")
+    image = Image.new("RGBA", image_size, color=background_color)
     point_size = pixels_to_points(image_size[1])
     # Load font to use
     font = ImageFont.truetype("Arial.ttf", floor(point_size))
