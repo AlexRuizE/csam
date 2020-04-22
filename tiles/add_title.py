@@ -6,12 +6,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 @click.command()
-@click.argument('source_image')
-@click.argument('title')
-def main(source_image:str, title: str):
+@click.argument("source_image")
+@click.argument("title")
+def main(source_image: str, title: str):
     add_title(source_image, title).show()
 
-def add_title(source_image: str, title:str):
+
+def add_title(source_image: str, title: str):
     """Adds a title to an image
 
     Args:
@@ -24,13 +25,14 @@ def add_title(source_image: str, title:str):
     orig_img = Image.open(source_image)
     orig_width, orig_height = orig_img.size
 
-    title = draw_text(title, (orig_width, floor(orig_height*0.1)))
+    title = draw_text(title, (orig_width, floor(orig_height * 0.1)))
     _, title_height = title.size
 
     image = Image.new("RGBA", (orig_width, orig_height + title_height))
     image.paste(title, (0, 0))
     image.paste(orig_img, (0, title_height))
     return image
+
 
 def draw_text(text: str, image_size: Tuple[int, int]):
     """Draws a text image
@@ -45,10 +47,11 @@ def draw_text(text: str, image_size: Tuple[int, int]):
     image = Image.new("RGBA", image_size, color="blue")
     point_size = pixels_to_points(image_size[1])
     # Load font to use
-    font = ImageFont.truetype('Arial.ttf', floor(point_size))
+    font = ImageFont.truetype("Arial.ttf", floor(point_size))
     draw_obj = ImageDraw.Draw(image)
-    draw_obj.text((0,0), text, font=font)
+    draw_obj.text((0, 0), text, font=font)
     return image
+
 
 def pixels_to_points(pixels):
     """Convert pixels to points assuming 96 dots per inch
@@ -59,7 +62,8 @@ def pixels_to_points(pixels):
     Returns:
         float: Number of points equivalent
     """
-    return pixels * 72/96
+    return pixels * 72 / 96
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
