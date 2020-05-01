@@ -1,4 +1,6 @@
 """Auxiliary functions."""
+import torch
+import matplotlib.pyplot as plt
 
 def get_k_img(k, img_dataset):
     """Get k images from a pytorch <dataset> object."""
@@ -10,4 +12,7 @@ def get_k_img(k, img_dataset):
     img_tensors = torch.stack(img_list)
     return img_tensors
 
-
+def plot_rand_img(img_dataset):
+    plt.close()
+    i = get_k_img(1, img_dataset)
+    plt.imshow(i[0].permute(1,2,0))

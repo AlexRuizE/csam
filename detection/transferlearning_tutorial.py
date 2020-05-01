@@ -29,7 +29,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()  # Set model to evaluate mode
 
             running_loss = 0.0
             running_corrects = 0
@@ -54,7 +54,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
                         outputs, aux_outputs = model(inputs)
                         loss1 = criterion(outputs, labels)
                         loss2 = criterion(aux_outputs, labels)
-                        loss = loss1 + 0.4*loss2
+                        loss = loss1 + 0.4 * loss2
                     else:
                         outputs = model(inputs)
                         loss = criterion(outputs, labels)
@@ -92,10 +92,12 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
+
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
         for param in model.parameters():
             param.requires_grad = False
+
 
 def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
     # Initialize these variables which will be set in this if statement. Each of these
@@ -118,7 +120,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft = models.alexnet(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
         input_size = 224
 
     elif model_name == "vgg":
@@ -127,7 +129,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft = models.vgg11_bn(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.classifier[6].in_features
-        model_ft.classifier[6] = nn.Linear(num_ftrs,num_classes)
+        model_ft.classifier[6] = nn.Linear(num_ftrs, num_classes)
         input_size = 224
 
     elif model_name == "squeezenet":
@@ -135,7 +137,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         """
         model_ft = models.squeezenet1_0(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
-        model_ft.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1,1), stride=(1,1))
+        model_ft.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1, 1), stride=(1, 1))
         model_ft.num_classes = num_classes
         input_size = 224
 
@@ -159,7 +161,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         model_ft.AuxLogits.fc = nn.Linear(num_ftrs, num_classes)
         # Handle the primary net
         num_ftrs = model_ft.fc.in_features
-        model_ft.fc = nn.Linear(num_ftrs,num_classes)
+        model_ft.fc = nn.Linear(num_ftrs, num_classes)
         input_size = 299
 
     else:
@@ -169,23 +171,22 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 
-
 # Models
 posible_models = ['resnet', 'alexnet', 'vgg', 'squeezenet', 'densenet', 'inception']
-model_name = 'vgg'
+model_name = 'squeezenet'
 
 # Top level data directory. Here we assume the format of the directory conforms to the ImageFolder structure
-data_dir = "~/Data/oidv6/"	# THIS DUR STRUCTURE COMES DIRECTLY FROM SHARED OIDTOOLKIT
-# data_dir = "~/Data/hymenoptera_data/"
+# data_dir = "~/Data/oidv6/"	# THIS DUR STRUCTURE COMES DIRECTLY FROM SHARED OIDTOOLKIT
+data_dir = "~/Data/hymenoptera_data/"
 
 # Number of classes in the dataset
-num_classes = 5
+num_classes = 2
 
 # Batch size for training (change depending on how much memory you have)
-batch_size = 128
+batch_size = 16
 
 # Number of epochs to train for
-num_epochs = 15
+num_epochs = 5
 
 # Flag for feature extracting. When False, we finetune the whole model,
 #   when True we only update the reshaped layer params
@@ -217,13 +218,14 @@ data_transforms = {
 print("Initializing Datasets and Dataloaders...")
 
 # Create training and validation datasets
-image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'validation']}
+image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in
+                  ['train', 'validation']}
 
 # Create training and validation dataloaders
-dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], 
-	batch_size=batch_size, 
-	shuffle=True, 
-	num_workers=4) for x in ['train', 'validation']}
+dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x],
+                                                   batch_size=batch_size,
+                                                   shuffle=True,
+                                                   num_workers=4) for x in ['train', 'validation']}
 
 # Detect if we have a GPU available
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -240,14 +242,14 @@ params_to_update = model_ft.parameters()
 print("Params to learn:")
 if feature_extract:
     params_to_update = []
-    for name,param in model_ft.named_parameters():
+    for name, param in model_ft.named_parameters():
         if param.requires_grad == True:
             params_to_update.append(param)
-            print("\t",name)
+            print("\t", name)
 else:
-    for name,param in model_ft.named_parameters():
+    for name, param in model_ft.named_parameters():
         if param.requires_grad == True:
-            print("\t",name)
+            print("\t", name)
 
 # Observe that all parameters are being optimized
 optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
@@ -256,6 +258,6 @@ optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 criterion = nn.CrossEntropyLoss()
 
 # Train and evaluate
-model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, 
-	num_epochs=num_epochs, 
-	is_inception=(model_name=="inception"))
+model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft,
+                             num_epochs=num_epochs,
+                             is_inception=(model_name == "inception"))
