@@ -3,10 +3,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
-import torchvision
 from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
 import time
 import os
 import copy
@@ -261,3 +258,5 @@ criterion = nn.CrossEntropyLoss()
 model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft,
                              num_epochs=num_epochs,
                              is_inception=(model_name == "inception"))
+
+# TODO: Save stuff.
