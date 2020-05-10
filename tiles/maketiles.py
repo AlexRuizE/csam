@@ -1,52 +1,100 @@
-import torch
+import argparse
+import os
+from src.func import *
 from torchvision import datasets, transforms
-from torchvision.utils import make_grid
-import matplotlib.pyplot as plt
+from torchvision.utils import make_grid, save_image
+from shutil import rmtree
 
+# Args parse
+parser = argparse.ArgumentParser()
+parser.add_argument('-i', '--indir', dest='oid_dir', type=str, required=True, help='Path to Open Image Dataset root. Use toolkit.')
+parser.add_argument('-o', '--outdir', dest='out_dir', type=str, required=True, help='Output directory for tiles.')
+parser.add_argument('-n', '--ntiles', dest='num_tiles', type=int, required=True, help='Number of tiles to generate.')
+parser.add_argument('-c', '--cleanup', dest='cleanup', type=int, required=False, default='1', help='Remove temp dirs.')
+args = parser.parse_args()
 
-def get_k_img(k, img_dataset):
-    """Get k images from a <dataset>"""
-    l = len(img_dataset.imgs)
-    indices = torch._np.random.choice(l,
-                                      size=k,
-                                      replace=False)
-    img_list = [img_dataset.__getitem__(i)[0] for i in indices]
-    img_tensors = torch.stack(img_list)
-    return img_tensors
-
-
-
-
-# Paths
-in_dir = '/home/monorhesus/Data/oidv6/' # Path to Open Image Dataset root. Use toolkit.
-out_dir = '/home/monorhesus/Pictures'
+oid_dir = args.oid_dir
+out_dir = args.out_dir
+num_tiles = args.num_tiles
+cleanup = args.cleanup
 
 if out_dir[-1] == '/':
     out_dir=out_dir[:-1]
 
+# Image set type with images (train or validation)
+img_set = 'validation'
 
-# Load images and transforms
-img_dir = 'validation'
-img_transforms = transforms.Compose([transforms.RandomHorizontalFlip(),
-                                     transforms.Resize((512,512)),
-                                     transforms.ToTensor()])
-img_dataset = datasets.ImageFolder(torch.os.path.join(in_dir, img_dir),
-                                     transform=img_transforms)
+# Define pad colors
+pad_colors = ('white', 'black')
 
+# Generate images with unequal paddings
+input_img_dir = f'{oid_dir}/{img_set}'
+pads = (0, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 1500)
+temp_dir = out_dir + f'/transformed_images'
 
-# Make grid
-paddings = [0,100]
-pad_values = [0,1]
-for p in paddings:
-    for v in pad_values:
-        imgs = get_k_img(25, img_dataset)
+for bg in pad_colors:
+    k = 32  # Images per combos
+    n = 32  # Number of pad combos to run.
+    for pad_combo in range(n):
+        pad = torch._np.random.choice(pads, 2, replace=False)
+
+        pad_dir = f'{temp_dir}/{bg}/{pad[0]}_{pad[1]}'
+        if not os.path.exists(pad_dir):
+            os.makedirs(pad_dir)  # Clunky but make_grid operates on all classes afaics
+
+        print(f'Padding ({pad_combo} out of {n}): {pad}, Background: {bg}')
+
+        img_transforms = transforms.Compose([
+            transforms.Pad(
+                padding=tuple(pad),
+                fill=bg,
+                padding_mode='constant'),
+            transforms.Resize((512,512)),
+            transforms.ToTensor()])
+        img_dataset = datasets.ImageFolder(
+            input_img_dir,
+            transform=img_transforms)
+
+        imgs = get_k_img(k, img_dataset)
+
+        for img in imgs:
+            filename = gen_str(7)
+            save_image(img, f'{pad_dir}/{filename}.jpg')
+
+    # Make tiles
+    img_transforms = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.Resize((512,512)),
+        transforms.ToTensor()])
+    img_dataset = datasets.ImageFolder(
+        torch.os.path.join(temp_dir, bg),
+        transform=img_transforms)
+
+    paddings = [0,1,2,3,4,5,6,7,8,9,10,25,50,100]
+    pad_values = {'white':1,'black':0}
+
+    tiles_dir = out_dir+f'/tiles/{bg}'
+    if not os.path.exists(tiles_dir):
+        os.makedirs(tiles_dir)
+
+    for i in range(num_tiles//2): # Half white/half black backgrounds
+        n_rows = int(torch._np.random.choice(range(3, 6), 1)[0])  # Rows in tile
+        n_cols = int(torch._np.random.choice(range(1, 6), 1)[0])
+        p = int(torch._np.random.choice(paddings, 1)[0])
+
+        imgs = get_k_img(n_rows*n_cols, img_dataset)
         g = make_grid(imgs,
-                      nrow=5,
-                      padding=p,           # Size in pixels of padding
-                      pad_value=v,          # 0 black, 1 white
+                      nrow=n_rows,
+                      padding=p,                    # Size in pixels of padding
+                      pad_value=pad_values[bg],     # 0 black, 1 white
                       normalize=False
                       )
-        plt.imshow(g.permute(1, 2, 0))
-        plt.axis('off')
-        plt.savefig(f'{out_dir}/tiles_{p}pad_{v}bg.png', bbox_inches='tight', pad_inches=0)
-        plt.close()
+        # plt.imshow(g.permute(1, 2, 0))
+        # plt.axis('off')
+        # plt.close()
+        filename = gen_str(7)
+        save_image(g, f'{tiles_dir}/{filename}.jpg')
+
+# Cleanup
+if cleanup==1:
+    rmtree(temp_dir)
