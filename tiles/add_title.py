@@ -27,7 +27,7 @@ def add_title(source_image: str, title: str, background_color: str = "black"):
     orig_img = Image.open(source_image)
     orig_width, orig_height = orig_img.size
 
-    title = draw_text(title, (orig_width, floor(orig_height * 0.1)), background_color)
+    title = _draw_text(title, (orig_width, floor(orig_height * 0.1)), background_color)
     _, title_height = title.size
 
     image = Image.new("RGBA", (orig_width, orig_height + title_height))
@@ -36,7 +36,7 @@ def add_title(source_image: str, title: str, background_color: str = "black"):
     return image
 
 
-def draw_text(text: str, image_size: Tuple[int, int], background_color: str = "black"):
+def _draw_text(text: str, image_size: Tuple[int, int], background_color: str = "black"):
     """Draws a text image
 
     Args:
@@ -48,7 +48,7 @@ def draw_text(text: str, image_size: Tuple[int, int], background_color: str = "b
         PIL.Image: An image of text
     """
     image = Image.new("RGBA", image_size, color=background_color)
-    point_size = pixels_to_points(image_size[1])
+    point_size = _pixels_to_points(image_size[1])
     # Load font to use
     font = ImageFont.truetype("Arial.ttf", floor(point_size))
     draw_obj = ImageDraw.Draw(image)
@@ -56,7 +56,7 @@ def draw_text(text: str, image_size: Tuple[int, int], background_color: str = "b
     return image
 
 
-def pixels_to_points(pixels):
+def _pixels_to_points(pixels):
     """Convert pixels to points assuming 96 dots per inch
 
     Args:
