@@ -11,12 +11,14 @@ parser.add_argument('-i', '--indir', dest='oid_dir', type=str, required=True, he
 parser.add_argument('-o', '--outdir', dest='out_dir', type=str, required=True, help='Output directory for tiles.')
 parser.add_argument('-n', '--ntiles', dest='num_tiles', type=int, required=True, help='Number of tiles to generate.')
 parser.add_argument('-c', '--cleanup', dest='cleanup', type=int, required=False, default='1', help='Remove temp dirs.')
+parser.add_argument('-s', '--separate', dest='separate', type=int, required=False, default='0', help='Separate dir for \different backgrounds?.')
 args = parser.parse_args()
 
 oid_dir = args.oid_dir
 out_dir = args.out_dir
 num_tiles = args.num_tiles
 cleanup = args.cleanup
+separate = args.separate
 
 if out_dir[-1] == '/':
     out_dir=out_dir[:-1]
@@ -73,7 +75,12 @@ for bg in pad_colors:
     paddings = [0,1,2,3,4,5,6,7,8,9,10,25,50,100]
     pad_values = {'white':1,'black':0}
 
-    tiles_dir = out_dir+f'/tiles/{bg}'
+    assert separate in (0,1,'0','1'), "Separate can only be 0 or 1."
+    if separate==1:
+        tiles_dir = out_dir+f'/tiles/{bg}'
+    else:
+        tiles_dir = out_dir + f'/tiles'
+
     if not os.path.exists(tiles_dir):
         os.makedirs(tiles_dir)
 
