@@ -3,15 +3,17 @@ import os
 from src.func import *
 from torchvision import datasets, transforms
 from torchvision.utils import make_grid, save_image
-from shutil import rmtree
+from shutil import rmtree, copyfile
+import numpy as np
 
 # Args parse
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--indir', dest='oid_dir', type=str, required=True, help='Path to Open Image Dataset root. Use toolkit.')
 parser.add_argument('-o', '--outdir', dest='out_dir', type=str, required=True, help='Output directory for tiles.')
 parser.add_argument('-n', '--ntiles', dest='num_tiles', type=int, required=True, help='Number of tiles to generate.')
+parser.add_argument('-x', '--nnotiles', dest='num_notiles', type=int, required=True, help='Number of non-tiles (images) to generate.')
 parser.add_argument('-c', '--cleanup', dest='cleanup', type=int, required=False, default='1', help='Remove temp dirs.')
-parser.add_argument('-s', '--separate', dest='separate', type=int, required=False, default='0', help='Separate dir for \different backgrounds?.')
+parser.add_argument('-s', '--separate', dest='separate', type=int, required=False, default='0', help='Separate dir for different backgrounds?')
 args = parser.parse_args()
 
 oid_dir = args.oid_dir
@@ -19,12 +21,21 @@ out_dir = args.out_dir
 num_tiles = args.num_tiles
 cleanup = args.cleanup
 separate = args.separate
+num_notiles = args.num_notiles
 
+# Clean-up paths
 if out_dir[-1] == '/':
     out_dir=out_dir[:-1]
+if oid_dir[-1] == '/':
+    oid_dir=oid_dir[:-1]
 
 # Image set type with images (train or validation)
 img_set = 'validation'
+
+
+#########
+# Tiles #
+#########
 
 # Define pad colors
 pad_colors = ('white', 'black')
@@ -105,3 +116,29 @@ for bg in pad_colors:
 # Cleanup
 if cleanup==1:
     rmtree(temp_dir)
+
+
+############
+# No tiles #
+############
+assert num_notiles>=0, "You cannot specify negative number of tiles."
+
+class_dir = os.path.join(oid_dir, img_set)
+img_classes = os.listdir(class_dir)
+num_classes = len(img_classes)
+img_per_class = int(np.round(num_notiles/num_classes))
+
+for c in img_classes:
+    print(f"Selecting {img_per_class} images from {c}")
+
+    in_path = os.path.join(class_dir, c)
+    out_path = os.path.join(out_dir, 'no_tiles')
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+
+    class_examples = np.random.choice(os.listdir(in_path), img_per_class, replace=True)
+
+    for i in class_examples:
+        src = os.path.join(in_path,i)
+        dst = os.path.join(out_path,i)
+        copyfile(src, dst)
