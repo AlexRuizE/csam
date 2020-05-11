@@ -50,7 +50,7 @@ def _draw_text(text: str, image_size: Tuple[int, int], background_color: str = "
     image = Image.new("RGBA", image_size, color=background_color)
     point_size = _pixels_to_points(image_size[1])
     # Load font to use
-    font = ImageFont.truetype("Arial.ttf", floor(point_size))
+    font = ImageFont.truetype("DejaVuSans.ttf", floor(point_size))
     draw_obj = ImageDraw.Draw(image)
     draw_obj.text((0, 0), text, font=font)
     return image
