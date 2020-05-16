@@ -1,5 +1,6 @@
 from math import floor
 from typing import Tuple
+import os
 
 import click
 from faker import Faker
@@ -7,10 +8,10 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 @click.command()
-@click.argument("source_image")
-@click.option("--background_color", default="black", help="Background color of title.")
-def main(source_image: str, background_color: str):
-    add_title(source_image, next(_gen_title()), background_color).show()
+@click.argument("source_dir")
+@click.argument("output_dir")
+def main(source_dir: str, output_dir: str):
+    _process_directory(source_dir, output_dir)
 
 
 def add_title(source_image: str, title: str, background_color: str = "black"):
@@ -124,6 +125,29 @@ def _gen_title():
     fake = Faker(locale_list)
     while True:
         yield fake.text(max_nb_chars=30)
+
+
+def _process_directory(in_dir, out_dir):
+    """Adds random titles to all images in a directory
+
+    Args:
+        in_dir (str): Directory of images to add titles to
+        out_dir (str): Directory of images with titles added
+
+    Returns:
+        None
+    """
+    def title_img(path):
+        fname = os.path.splitext(os.path.basename(path))[0]
+        ext = '.png'
+        title = next(_gen_title())
+        add_title(path, title).save(os.path.join(out_dir, fname + ext))
+
+    os.makedirs(out_dir, exist_ok=True)
+    with os.scandir(in_dir) as dir:
+        for entry in dir:
+            if not entry.name.startswith(".") and entry.is_file():
+                title_img(os.path.join(in_dir, entry.name))
 
 
 if __name__ == "__main__":
