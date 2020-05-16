@@ -2,15 +2,15 @@ from math import floor
 from typing import Tuple
 
 import click
+from faker import Faker
 from PIL import Image, ImageDraw, ImageFont
 
 
 @click.command()
 @click.argument("source_image")
-@click.argument("title")
 @click.option("--background_color", default="black", help="Background color of title.")
-def main(source_image: str, title: str, background_color: str):
-    add_title(source_image, title, background_color).show()
+def main(source_image: str, background_color: str):
+    add_title(source_image, next(_gen_title()), background_color).show()
 
 
 def add_title(source_image: str, title: str, background_color: str = "black"):
@@ -66,6 +66,64 @@ def _pixels_to_points(pixels):
         float: Number of points equivalent
     """
     return pixels * 72 / 96
+
+
+def _gen_title():
+    """Generates a title
+
+    Returns:
+        generator: A title generator
+    """
+    locale_list = [
+        "ar_EG",
+        "ar_PS",
+        "ar_SA",
+        "bg_BG",
+        "bs_BA",
+        "cs_CZ",
+        "de_DE",
+        "dk_DK",
+        "el_GR",
+        "en_AU",
+        "en_CA",
+        "en_GB",
+        "en_IN",
+        "en_NZ",
+        "en_US",
+        "es_ES",
+        "es_MX",
+        "et_EE",
+        "fa_IR",
+        "fi_FI",
+        "fr_FR",
+        "hi_IN",
+        "hr_HR",
+        "hu_HU",
+        "hy_AM",
+        "it_IT",
+        "ja_JP",
+        "ka_GE",
+        "ko_KR",
+        "lt_LT",
+        "lv_LV",
+        "ne_NP",
+        "nl_NL",
+        "no_NO",
+        "pl_PL",
+        "pt_BR",
+        "pt_PT",
+        "ro_RO",
+        "ru_RU",
+        "sl_SI",
+        "sv_SE",
+        "tr_TR",
+        "uk_UA",
+        "zh_CN",
+        "zh_TW",
+    ]
+    fake = Faker(locale_list)
+    while True:
+        yield fake.text(max_nb_chars=30)
 
 
 if __name__ == "__main__":
