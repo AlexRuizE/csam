@@ -1,4 +1,4 @@
-# Excerpts from https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
+# Modified from from https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
 
 import torch
 import torch.nn as nn
@@ -7,6 +7,7 @@ from torchvision import datasets, models, transforms
 import time
 import os
 import copy
+import argparse
 
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
@@ -168,20 +169,28 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     return model_ft, input_size
 
 
-# Models
-model_name = 'squeezenet'
+# Args parse
+parser = argparse.ArgumentParser()
+parser.add_argument('-i', '--indir', dest='data_dir', type=str, required=True, help='Path to ImageFolder.')
+parser.add_argument('-o', '--outdir', dest='out_dir', type=str, required=True, help='Output directory for model parameters.')
+parser.add_argument('-c', '--classes', dest='num_classes', type=int, required=False, default='2', help='Number of classes.')
+parser.add_argument('-m', '--model', dest='model_name', type=str, required=False, default='squeezenet', help='Model name.')
+parser.add_argument('-b', '--batch', dest='batch_size', type=int, required=False, default='16', help='Batch size.')
+parser.add_argument('-e', '--epochs', dest='num_epochs', type=int, required=False, default='10', help='Number of epochs.')
+args = parser.parse_args()
 
-# Top level data directory. Here we assume the format of the directory conforms to the ImageFolder structure
-data_dir = "/home/monorhesus/Pictures/csam/tile_training/"
+data_dir = args.data_dir
+out_dir = args.out_dir
+num_classes = args.num_classes
+model_name = args.model_name
+batch_size = args.batch_size
+num_epochs = args.num_epochs
 
-# Number of classes in the dataset
-num_classes = 2
-
-# Batch size for training (change depending on how much memory you have)
-batch_size = 16
-
-# Number of epochs to train for
-num_epochs = 5
+# Clean-up paths
+if out_dir[-1] == '/':
+    out_dir=out_dir[:-1]
+if data_dir[-1] == '/':
+    data_dir=data_dir[:-1]
 
 # Flag for feature extracting. When False, we finetune the whole model,
 #  when True we only update the reshaped layer params
@@ -256,4 +265,5 @@ model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft
                              num_epochs=num_epochs,
                              is_inception=(model_name == "inception"))
 
-torch.save(model_ft.state_dict(), '~/git/csam/detection/tile_detector.pkl')
+torch.save(model_ft.state_dict(), out_dir+'/tile_detector.pkl')
+print(f"Model parameters saved in {out_dir+'/tile_detector.pkl'}\nDone.")
