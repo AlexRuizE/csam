@@ -1,3 +1,6 @@
 #torch
 #torchvision
 matplotlib
+Pillow
+click
+Faker
