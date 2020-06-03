@@ -133,7 +133,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     elif model_name == "squeezenet":
         """ Squeezenet
         """
-        model_ft = models.squeezenet1_0(pretrained=use_pretrained)
+        model_ft = models.squeezenet1_1(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
         model_ft.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1, 1), stride=(1, 1))
         model_ft.num_classes = num_classes
@@ -257,8 +257,14 @@ else:
 # Observe that all parameters are being optimized
 optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 
-# Setup the loss fn
-criterion = nn.CrossEntropyLoss()
+# Loss fn
+criterion = nn.CrossEntropyLoss() # Original
+# targets = image_datasets['train'].targets
+# class_count = torch._np.unique(targets, return_counts=True)[1]
+# # weights = torch.Tensor(1/class_count) # Version A
+# weights = torch.Tensor(torch._np.array([1,class_count[0]/class_count[1]])) # Version B
+# criterion = nn.CrossEntropyLoss(weight=weights)
+
 
 # Train and evaluate
 model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft,

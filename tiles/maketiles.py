@@ -37,6 +37,13 @@ img_set = 'train'
 # Tiles #
 #########
 if num_tiles>0:
+
+    if num_tiles < 100:
+        k = 32  # Images per combos
+        n = 32  # Number of pad combos to run.
+    else:
+        k = 64
+        n = 64
     # Define pad colors
     pad_colors = ('white', 'black')
 
@@ -46,8 +53,6 @@ if num_tiles>0:
     temp_dir = out_dir + f'/transformed_images'
 
     for bg in pad_colors:
-        k = 32  # Images per combos
-        n = 32  # Number of pad combos to run.
         for pad_combo in range(n):
             pad = torch._np.random.choice(pads, 2, replace=False)
 

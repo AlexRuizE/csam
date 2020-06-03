@@ -22,3 +22,9 @@ def gen_str(n):
     rnd_str = torch._np.random.choice(letters, n)
     return ''.join(rnd_str)
 
+# def get_weights(image_datasets):
+#     assert isinstance(image_datasets, dict)
+#     targets = image_datasets['train'].targets
+#     _, samples = torch._np.unique(targets, return_counts=True)
+#     assert len(samples)==2, 'Weights for more than two classes not implemented yet.'
+#     argmax_samples = torch._np.argmax(samples)
