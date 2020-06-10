@@ -8,6 +8,7 @@ from torchvision import models, transforms, datasets
 from sklearn.metrics import confusion_matrix
 from shutil import move
 from datetime import datetime
+import numpy as np
 
 #############
 # Functions #
@@ -67,7 +68,7 @@ def get_tiles(img_dataset, results):
     """Get the file names of images detected as tiles."""
     img_names = [i[0] for i in img_dataset.imgs]
     tile_indices = results
-    tiles_pred = torch._np.where(tile_indices==1)[0]
+    tiles_pred = np.where(tile_indices==1)[0]
     tile_files = [img_names[t] for t in tiles_pred]
     return tile_files
 
@@ -156,17 +157,17 @@ if __name__ == '__main__':
     # Classify images
     print("Classifying images, please wait...")
     softmax = torch.nn.Softmax(dim=1)
-    results = torch._np.array([])
+    results = np.array([])
     for inputs, labels in dataloader:
         outputs = model(inputs) # logits
         class_probs = softmax(outputs)
         pred_class = torch.max(class_probs,1)[1].numpy()
-        results = torch._np.append(results, pred_class)
+        results = np.append(results, pred_class)
     print("Done classifying.")
 
     # Confusion matrix in test mode
     if test_mode == 1:
-        tile_indices = torch._np.array([1 if 'tile_' in i else 0 for i in [i[0] for i in img_dataset.imgs]])
+        tile_indices = np.array([1 if 'tile_' in i else 0 for i in [i[0] for i in img_dataset.imgs]])
         print(confusion_matrix(tile_indices, results))
 
     # Get tile files
