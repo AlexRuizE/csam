@@ -96,12 +96,12 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--idir', dest='image_dir',
                         type=str,
                         required=False,
-                        default='/var/local'
+                        default='/var/local',
                         help='Path to images for classification.')
     parser.add_argument('-o', '--odir', dest='out_dir',
                         type=str,
                         required=False,
-                        default='/var/local/output'
+                        default='/var/local/output',
                         help='Output directory for detected tile image paths.')
     parser.add_argument('-f', '--mfile', dest='model_file',
                         type=str,
