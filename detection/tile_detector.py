@@ -51,8 +51,7 @@ def dir_structure(image_dir):
     image_dir_files = os.listdir(image_dir)
     fake_dir = '/1'
     assert len(image_dir_files) != 0, "Image directory is empty."
-    if os.path.exists(image_dir+fake_dir): #len(image_dir_files) == 1:
-        # f = ''.join([image_dir, os.sep, image_dir_files[0]])
+    if os.path.exists(image_dir+fake_dir):
         if os.path.isdir(image_dir+fake_dir):
             print('Image directory structure test: OK.')
     else:
