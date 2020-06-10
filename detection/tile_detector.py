@@ -74,6 +74,8 @@ def get_tiles(img_dataset, results):
 def write_results(tile_files, out_dir):
     """Write text file with image paths detected as tiles."""
     f_out_name = datetime.now().strftime(format='%Y%m%d%H')
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
     f_out = ''.join([out_dir, '/tiles_', f_out_name])
     with open(f_out, 'w') as f:
         for filename in tile_files:
@@ -95,11 +97,13 @@ if __name__ == '__main__':
                         help='Path to model parameters.')
     parser.add_argument('-i', '--idir', dest='image_dir',
                         type=str,
-                        required=True,
+                        required=False,
+                        default='/var/local',
                         help='Path to images for classification.')
     parser.add_argument('-o', '--odir', dest='out_dir',
                         type=str,
-                        required=True,
+                        required=False,
+                        default='/var/local/output',
                         help='Output directory for detected tile image paths.')
     parser.add_argument('-f', '--mfile', dest='model_file',
                         type=str,
