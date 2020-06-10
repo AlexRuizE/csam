@@ -49,14 +49,14 @@ def clean_paths(param_dir, image_dir, out_dir, model_file):
 def dir_structure(image_dir):
     """Creates the appropriate mock image dir structure, if needed."""
     image_dir_files = os.listdir(image_dir)
+    fake_dir = '/1'
     assert len(image_dir_files) != 0, "Image directory is empty."
-    if len(image_dir_files) == 1:
-        f = ''.join([image_dir, os.sep, image_dir_files[0]])
-        if os.path.isdir(f):
+    if os.path.exists(image_dir+fake_dir): #len(image_dir_files) == 1:
+        # f = ''.join([image_dir, os.sep, image_dir_files[0]])
+        if os.path.isdir(image_dir+fake_dir):
             print('Image directory structure test: OK.')
     else:
         print("Rearranging image dir structure, this might take a while...")
-        fake_dir = '/1'
         os.mkdir(image_dir+fake_dir)
         for i in image_dir_files:
             src = os.path.join(image_dir, i)
