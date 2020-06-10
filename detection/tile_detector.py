@@ -75,6 +75,8 @@ def get_tiles(img_dataset, results):
 def write_results(tile_files, out_dir):
     """Write text file with image paths detected as tiles."""
     f_out_name = datetime.now().strftime(format='%Y%m%d%H')
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
     f_out = ''.join([out_dir, '/tiles_', f_out_name])
     with open(f_out, 'w') as f:
         for filename in tile_files:
