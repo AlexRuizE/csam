@@ -80,7 +80,7 @@ def write_results(tile_files, out_dir):
     f_out = ''.join([out_dir, '/tiles_', f_out_name])
     with open(f_out, 'w') as f:
         for filename in tile_files:
-            f.write(f'{filename}\n')
+            f.write(f'{os.path.split(filename)[-1]}\n')
     print(f"Detected tiles written to {f_out}")
 
 #### End of Functions ####
