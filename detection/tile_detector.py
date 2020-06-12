@@ -50,7 +50,7 @@ def clean_paths(param_dir, image_dir, out_dir, model_file):
 def dir_structure(image_dir):
     """Creates the appropriate mock image dir structure, if needed."""
     image_dir_files = os.listdir(image_dir)
-    fake_dir = '/1'
+    fake_dir = '/input'
     assert len(image_dir_files) != 0, "Image directory is empty."
     if os.path.exists(image_dir+fake_dir):
         if os.path.isdir(image_dir+fake_dir):
