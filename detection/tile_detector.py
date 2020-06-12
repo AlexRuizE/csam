@@ -51,7 +51,7 @@ def dir_structure(image_dir):
     """Creates the appropriate mock image dir structure, if needed."""
     image_dir_files = os.listdir(image_dir)
     fake_dir = '/input'
-    assert len(image_dir_files) != 0, "Image directory is empty."
+    assert len(image_dir_files) != 0, f"Image directory {image_dir_files} is empty."
     if os.path.exists(image_dir+fake_dir):
         if os.path.isdir(image_dir+fake_dir):
             print('Image directory structure test: OK.')
